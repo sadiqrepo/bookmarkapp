@@ -1,5 +1,7 @@
 package com.bookmarkapp.entities;
 
+import com.bookmarkapp.constants.BookGenre;
+
 import java.util.Arrays;
 
 /**
@@ -53,6 +55,14 @@ public class Book extends Bookmark {
         this.amazonRating = amazonRating;
     }
 
+
+    @Override
+    public boolean isKidFriendlyEligible() {
+        if(genre.equals(BookGenre.PHILOSOPHY) || genre.equals(BookGenre.SELF_HELP)){
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public String toString() {
