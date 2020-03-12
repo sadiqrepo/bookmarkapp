@@ -6,6 +6,7 @@ import com.bookmarkapp.controllers.BookmarkController;
 import com.bookmarkapp.entities.Book;
 import com.bookmarkapp.entities.Bookmark;
 import com.bookmarkapp.entities.User;
+import com.bookmarkapp.partner.Shareable;
 
 /**
  * Created by sadiq on 10/03/20.
@@ -42,16 +43,29 @@ public class View {
                     }
                 }
 
-                // Mark as kid - friendly
+
                 if(user.getUserType().equals(UserType.EDITOR)
                         || user.getUserType().equals(UserType.CHIEF_EDITOR)){
+
+                    // Mark as kid - friendly
                     if(bookmark.isKidFriendlyEligible()
                             && bookmark.getKidFriendlyStatus().equals(KidFriendlyStatus.UNKNOWN)){
                         String kidFriendlyStatus = getKidFriendlyStatusDecision(bookmark);
 
                         if(!kidFriendlyStatus.equals(KidFriendlyStatus.UNKNOWN)){
-                            bookmark.setKidFriendlyStatus(kidFriendlyStatus);
-                            System.out.println("Kid-friendly status: "+kidFriendlyStatus + ", "+bookmark);
+                           BookmarkController.getInstance().setKidFriendlyStatus(user, kidFriendlyStatus,bookmark);
+
+                        }
+                    }
+
+
+                    // Sharing the Bookmark with third party!!
+
+                    if(bookmark.getKidFriendlyStatus().equals(KidFriendlyStatus.APPROVED)
+                            && bookmark instanceof Shareable){
+                        boolean isShared = getShareDecision();
+                        if(isShared){
+                            BookmarkController.getInstance().share(user, bookmark);
                         }
                     }
                 }
@@ -59,6 +73,11 @@ public class View {
 
                 }
         }
+    }
+
+    // TODO: Below methods simulate user input. After IO, we take input via console.
+    private static boolean getShareDecision() {
+        return Math.random() < 0.5 ? true : false ;
     }
 
     private static String getKidFriendlyStatusDecision(Bookmark bookmark) {
